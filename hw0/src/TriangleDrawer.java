@@ -1,3 +1,5 @@
+/** @author Fiora
+ */
 public class TriangleDrawer {
 
     public static void drawTriangle(int N) {
