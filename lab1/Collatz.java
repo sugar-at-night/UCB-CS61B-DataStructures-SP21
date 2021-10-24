@@ -1,5 +1,6 @@
 /** Class that prints the Collatz sequence starting from a given number.
  *  @author Fiora
+ *  @date 2021.10.21
  */
 public class Collatz {
 
