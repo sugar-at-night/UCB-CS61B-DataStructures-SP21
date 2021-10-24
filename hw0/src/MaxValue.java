@@ -1,3 +1,5 @@
+/** @author Fiora
+ */
 public class MaxValue {
     public static int maxFOR(int[] m) {
         int maxNum = 0;
