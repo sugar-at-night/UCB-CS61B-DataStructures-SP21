@@ -1,3 +1,6 @@
+/** @author Fiora
+ */
+
 public class BreakContinue {
 
     public static void windowPosSum(int[] a, int n) {
