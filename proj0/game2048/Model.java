@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author TODO: Fiora Yan
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -114,9 +114,57 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        /**Board sample:
+        (0,3),(1,3),(2,3),(3,3)
+        (0,2),(1,2),(2,2),(3,2)
+        (0,1),(1,1),(2,1),(3,1)
+        (0,0),(1,0),(2,0),(3,0)
+        Pay attention for the direction of row. row = 0 is bottom
+        */
+        Board b = this.board;
+        int size = b.size();
+        board.setViewingPerspective(side);
+        for (int col = size -1; col >=0; col--) {
+            if(oneColOnly(col)){
+                changed =true;
+            }
+        }
+
+        board.setViewingPerspective(Side.NORTH);
+
         checkGameOver();
         if (changed) {
             setChanged();
+        }
+        return changed;
+    }
+    private boolean oneColOnly(int col){
+        boolean changed = false;
+        int size = board.size();
+        boolean merged[] = new boolean[size]; //default: false
+        for(int row = size - 2; row >= 0; row -= 1){
+            if (board.tile(col, row) != null){
+                Tile tile = board.tile(col, row);
+                int tmpVal = tile.value();
+                //check the tiles up from the current tile
+                //cr > row : should not check the tile itself
+                for(int cr = size -1; cr > row; cr -= 1){
+                    Tile targetTile = board.tile(col, cr);
+                    //never merged, not null, equals to current tile
+                    if(!merged[cr] && targetTile != null && targetTile.value() == tmpVal){
+                        board.move(col, cr, tile);
+                        score += tmpVal * 2;
+                        merged[cr] = true; // Do the merge
+                        changed =true;
+                        break;
+                    }else if(targetTile == null){
+                        //move to empty tile
+                        board.move(col, cr, tile);
+                        changed =true;
+                        break;
+                    }
+                }
+            }
         }
         return changed;
     }
@@ -138,6 +186,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int col, row = 0;
+        for (col = 0; col < b.size(); col++) {
+            for (row = 0; row < b.size(); row++) {
+                if (b.tile(col,row) == null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +204,17 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        int col, row = 0;
+        for (col = 0; col < b.size(); col++) {
+            for (row = 0; row < b.size(); row++) {
+                if (b.tile(col,row) == null){
+                    continue;
+                }
+                if (b.tile(col,row).value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,7 +226,45 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        else{
+            int bsize = b.size();
+            for (int col = 0; col < bsize; col += 1) {
+                for (int row = 0; row < bsize; row += 1) {
+                    int tileValue = b.tile(col,row).value();
+                    if (isValidIndex(bsize,row + 1)){
+                        if(b.tile(col,row+1).value() == tileValue){
+                            return true;
+                        }
+                    }
+                    if (isValidIndex(bsize,row - 1)){
+                        if(b.tile(col,row - 1).value() == tileValue){
+                            return true;
+                        }
+                    }
+                    if (isValidIndex(bsize,col + 1)){
+                        if(b.tile(col + 1,row).value() == tileValue){
+                            return true;
+                        }
+                    }
+                    if (isValidIndex(bsize,col - 1)){
+                        if(b.tile(col - 1,row).value() == tileValue){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
+    }
+    private static boolean isValidIndex(int size, int i){
+        boolean isValid = true;
+        if (i < 0 || i >= size){
+            isValid = false;
+        }
+        return  isValid;
     }
 
 
