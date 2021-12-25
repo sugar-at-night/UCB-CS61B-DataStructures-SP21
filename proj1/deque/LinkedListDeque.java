@@ -1,9 +1,25 @@
 package deque;
 
-public class LinkedListDeque {
+import java.util.Iterator;
 
+public class LinkedListDeque<T> implements Iterable<T> {
+
+    private class StuffNode {
+        public StuffNode prev;
+        public T item;
+        public StuffNode next;
+        /**
+         * Creates a constrctor of StuffNode.
+         */
+        public StuffNode(StuffNode p, T i, StuffNode n) {
+            prev = p;
+            item = i;
+            next = n;
+        }
+    }
     private int size;
-    private final StuffNode sentinel;
+    private StuffNode sentinel;
+
     /**
      * Creates an empty linked list deque.
      */
@@ -15,39 +31,44 @@ public class LinkedListDeque {
     }
 
     /**
-     * Adds an item to the front of the list.
+     * Adds an item of type T to the front of the deque.
+     * You can assume that item is never null.
      */
     public void addFirst(T item) {
-        sentinel.next = new StuffNode(sentinel, item, sentinel.next);
-        sentinel.next.next.prev = sentinel.next;
+        StuffNode NewNode = new StuffNode(sentinel, item, sentinel.next);
+        sentinel.next.prev = NewNode;
+        sentinel.next = NewNode;
         size++;
     }
 
     /**
-     * Adds an item to the end of the list.
+     * Adds an item of type T to the back of the deque.
+     * You can assume that item is never null.
      */
     public void addLast(T item) {
-        sentinel.prev = new StuffNode(sentinel.prev, item, sentinel);
-        sentinel.prev.prev.next = sentinel.prev;
+        StuffNode NewNode = new StuffNode(sentinel.prev, item, sentinel);
+        sentinel.prev.next = NewNode;
+        sentinel.prev = NewNode;
         size++;
     }
 
     /**
-     * Return if this list is empty.
+     * Returns true if deque is empty, false otherwise.
      */
     public boolean isEmpty() {
         return size == 0;
     }
 
     /**
-     * Return the size.
+     * Returns the number of items in the deque.
      */
     public int size() {
         return size;
     }
 
     /**
-     * Print the deque.
+     *  Prints the items in the deque from first to last, separated by a space.
+     *  Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
         StuffNode p = sentinel.next;
@@ -56,36 +77,41 @@ public class LinkedListDeque {
             p = p.next;
         }
         System.out.print(p.item);
+        System.out.println();
     }
 
     /**
-     * Remove the first item in the list if the list is not null.
+     * Removes and returns the item at the front of the deque.
+     * If no such item exists, returns null.
      */
     public T removeFirst() {
         if (sentinel.next == sentinel)
             return null;
         StuffNode temp = sentinel.next;
-        sentinel.next.next.prev = sentinel;
         sentinel.next = sentinel.next.next;
+        sentinel.next.prev = sentinel;
         size--;
         return temp.item;
     }
 
     /**
-     * Remove the last item in the list if the list is not null.
+     * Removes and returns the item at the back of the deque.
+     * If no such item exists, returns null.
      */
     public T removeLast() {
         if (sentinel.prev == sentinel)
             return null;
         StuffNode temp = sentinel.prev;
-        sentinel.prev.prev.next = sentinel;
         sentinel.prev = sentinel.prev.prev;
+        sentinel.prev.next = sentinel;
         size--;
         return temp.item;
     }
 
     /**
-     * Return the item according to the index.
+     * Gets the item at the given index, where 0 is the front, 1 is the next item, and so forth.
+     * If no such item exists, returns null.
+     * Must not alter the deque!
      */
     public T get(int index) {
         StuffNode p = sentinel.next;
@@ -123,20 +149,8 @@ public class LinkedListDeque {
         return new LinkedListDequeIterator();
     }
 
-    private class StuffNode {
-        public StuffNode prev;
-        public T item;
-        public StuffNode next;
-
-        public StuffNode(StuffNode p, T i, StuffNode n) {
-            prev = p;
-            item = i;
-            next = n;
-        }
-    }
-
     private class LinkedListDequeIterator implements Iterator<T> {
-        private StuffNode<T> p;
+        private StuffNode p;
 
         public LinkedListDequeIterator() {
             p = sentinel.next;
