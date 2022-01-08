@@ -2,14 +2,14 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<T> implements Iterable<T> {
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     private class StuffNode {
         public StuffNode prev;
         public T item;
         public StuffNode next;
         /**
-         * Creates a constrctor of StuffNode.
+         * Creates a constructor of StuffNode.
          */
         public StuffNode(StuffNode p, T i, StuffNode n) {
             prev = p;
@@ -34,6 +34,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * Adds an item of type T to the front of the deque.
      * You can assume that item is never null.
      */
+    @Override
     public void addFirst(T item) {
         StuffNode NewNode = new StuffNode(sentinel, item, sentinel.next);
         sentinel.next.prev = NewNode;
@@ -45,6 +46,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * Adds an item of type T to the back of the deque.
      * You can assume that item is never null.
      */
+    @Override
     public void addLast(T item) {
         StuffNode NewNode = new StuffNode(sentinel.prev, item, sentinel);
         sentinel.prev.next = NewNode;
@@ -55,13 +57,17 @@ public class LinkedListDeque<T> implements Iterable<T> {
     /**
      * Returns true if deque is empty, false otherwise.
      */
-    public boolean isEmpty() {
-        return size == 0;
-    }
+    /**
+     * No need now, since there is a default one.
+     */
+//    public boolean isEmpty() {
+//        return size == 0;
+//    }
 
     /**
      * Returns the number of items in the deque.
      */
+    @Override
     public int size() {
         return size;
     }
@@ -70,6 +76,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      *  Prints the items in the deque from first to last, separated by a space.
      *  Once all the items have been printed, print out a new line.
      */
+    @Override
     public void printDeque() {
         StuffNode p = sentinel.next;
         for (int i = 0; i < size - 1; i++) {
@@ -84,6 +91,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * Removes and returns the item at the front of the deque.
      * If no such item exists, returns null.
      */
+    @Override
     public T removeFirst() {
         if (sentinel.next == sentinel)
             return null;
@@ -98,6 +106,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * Removes and returns the item at the back of the deque.
      * If no such item exists, returns null.
      */
+    @Override
     public T removeLast() {
         if (sentinel.prev == sentinel)
             return null;
@@ -113,6 +122,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * If no such item exists, returns null.
      * Must not alter the deque!
      */
+    @Override
     public T get(int index) {
         StuffNode p = sentinel.next;
         if (index >= size || p == sentinel) {
@@ -145,6 +155,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * The Deque objects we’ll make are iterable (i.e. Iterable<T>)
      * so we must provide this method to return an iterator.
      */
+    @Override
     public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }
@@ -166,7 +177,33 @@ public class LinkedListDeque<T> implements Iterable<T> {
             return item;
         }
 
+    }
 
+    /**
+     * Returns whether or not the parameter o is equal to the Deque.
+     * o is considered equal if it is a Deque and if it contains the same contents
+     * (as goverened by the generic T’s equals method) in the same order.
+     * (ADDED 2/12: You’ll need to use the instance of keywords for this.)
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Deque)) {
+            return false;
+        }
+
+        Deque other = (Deque) o;
+        if (size != other.size()) {
+            return false;
+        }
+
+        StuffNode p = sentinel.next;
+        for (int i = 0; i < size; i++) {
+            if (!p.item.equals(other.get(i))) {
+                return false;
+            }
+            p = p.next;
+        }
+        return true;
     }
 
 
