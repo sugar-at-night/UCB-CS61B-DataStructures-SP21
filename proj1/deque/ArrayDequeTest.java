@@ -171,6 +171,10 @@ public class ArrayDequeTest {
         ad2.addLast(0);
         assertEquals(ad1, ad2);
 
+        ad1.addFirst(10);
+        ad2.addFirst(10);
+        assertEquals(ad1, ad2);
+
         ad1.addLast(1);
         assertNotEquals(ad1, ad2);
 
@@ -205,4 +209,25 @@ public class ArrayDequeTest {
             }
         }
     }
+
+
+    /**
+     * Since there is no test for printdeque method,
+     * so i write one.
+     */
+
+    @Test
+    public void printdequeTest() {
+        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
+
+        assertTrue("Should be empty", arrayDeque.isEmpty());
+
+        arrayDeque.addFirst("front");
+        arrayDeque.addLast("middle");
+        arrayDeque.addLast("back");
+
+        System.out.println("Printing out deque: ");
+        arrayDeque.printDeque();
+
+}
 }
