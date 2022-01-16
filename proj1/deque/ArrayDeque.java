@@ -21,14 +21,86 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     /**
-     * Starts at items[1]
+     * Minus one circularly.
      */
-    public ArrayDeque(T item) {
-        items[1] = item;
-        size = 1;
-        nextFirst = 0;
-        nextLast = 2;
+    public int minusOne(int index) {
+        return Math.floorMod(index-1, items.length);
+
     }
+    /**
+     * Add one circularly.
+     */
+    public int plusOne(int index) {
+        return Math.floorMod(index+1, items.length);
+    }
+
+
+    /**
+     * For arrays of length 16 or more, your usage factor should always be at least 25%.
+     * Before performing a remove operation that will bring the number of elements in the array under 25% the length of the array,
+     * you should resize the size of the array down.
+     * I decided down it to 50%, so the new length will be twice of the size.
+     */
+    /**  resize an array.
+     *
+     *   1. For arrays of length 16 or more, usage factor should always be at least 25%
+     *      Otherwise halve the array.
+     *      For smaller arrays, usage factor can be arbitrarily low.
+     *
+     *      Usage factor < 25% < 50%. So we can shrink the array size by 2 with no overflow.
+     *
+     *
+     *
+     *   2. Array is full and enlarge the Array.
+     *
+     *      Enlarge Factor = 2
+     *
+     *
+     *   3. My strategy for adjusting capacity of Array:
+     *
+     *      1) shrinking size
+     *
+     *      2) increasing size
+     *
+     *      [current array]: (1 2 3 4 5 6 7 8)
+     *      whenever we want to add a new element, we need increase the capacity of
+     *      current array, the strategy I applied is as follows
+     *
+     *      (1 2 3 4 5 6 7 8) -> (null 1 2 3 4 5 6 7 8 null ...)
+     *
+     *      that means I use `System.arraycopy` function copy all the elements in oringinal
+     *      array to a new array with default starting index `1`. And I move the First pointer
+     *      to the first position of the new Array (nextFirst = 0;) and Last pointer to the last
+     *      element position of the new Array.
+     *
+     *      Though, it seems a little dummy... :)
+     *
+     * */
+    private void resize() {
+        if (size == items.length) {
+            resizeHelper(items.length * 2);
+        } else if (size < (items.length / 4) && items.length > 16) {
+            resizeHelper(items.length / 2);
+        }
+    }
+
+    /**
+     * A helper method of below
+     */
+    private void resizeHelper(int capacity) {
+        T[] newArray = (T[]) new Object[capacity];
+        int startPos = plusOne(nextFirst); // the index of the first item in original deque
+        for (int newIndex = 0; newIndex < size; newIndex++) {
+            newArray[newIndex] = items[startPos];
+            startPos = plusOne(startPos);
+        }
+        items = newArray;
+        nextFirst = capacity - 1; // since the new array is starting from true 0 index.
+        nextLast = size;
+    }
+
+
+
 
     /**
      * Adds an item of type T to the front of the deque.
@@ -36,12 +108,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
      */
     @Override
     public void addFirst(T item) {
+        resize();
         items[nextFirst] = item;
-        size += 1;
-        nextFirst -= 1;
-        if (nextFirst == -1) {
-            resize(size * 2);
-        }
+        nextFirst = minusOne(nextFirst);
+        size++;
     }
 
     /**
@@ -50,12 +120,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
      */
     @Override
     public void addLast(T item) {
+        resize();
         items[nextLast] = item;
-        size += 1;
-        nextLast += 1;
-        if (nextLast == items.length) {
-            resize(size * 2);
-        }
+        nextLast = plusOne(nextLast);
+        size++;
     }
 
     /**
@@ -74,9 +142,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
      */
     @Override
     public void printDeque() {
-        for (int i = 1; i < size+1; i++) {
-            System.out.print(items[i] + " ");
-        }
+//        for (int i = 1; i < size+1; i++) {
+//            System.out.print(items[i] + " ");
+//        }
+
+//        Arrays.stream(items).filter(Objects::nonNull).map(p -> p + " ").forEach(System.out::print);
+
+        Arrays.stream(items).map(p -> p + " ").forEach(System.out::print);
         System.out.println();
 
     }
@@ -90,11 +162,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (isEmpty()) {
             return null;
         }
-        nextFirst += 1;
+        resize();
+        nextFirst = plusOne(nextFirst);
         T item = items[nextFirst];
         items[nextFirst] = null;
-        size -= 1;
-        shrinkSize();
+        size--;
         return item;
     }
 
@@ -107,40 +179,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (isEmpty()) {
             return null;
         }
-        nextLast -= 1;
+        resize();
+        nextLast = minusOne(nextLast);
         T item = items[nextLast];
         items[nextLast] = null;
-        size -= 1;
-        shrinkSize();
+        size --;
         return item;
     }
 
 
-    /**
-     * For arrays of length 16 or more, your usage factor should always be at least 25%.
-     * Before performing a remove operation that will bring the number of elements in the array under 25% the length of the array,
-     * you should resize the size of the array down.
-     * I decided down it to 50%, so the new length will be twice of the size.
-     */
-    private void shrinkSize() {
-        if (isEmpty()) {
-            resize(8);
-        } else if (size/ items.length < 0.25 && size * 2 >= 8) {
-            resize(size * 2);
-        }
-    }
-
-    /**
-     * A helper method of below
-     */
-    private void resize(int l) {
-        T[] newItems = (T[]) new Object[l];
-        int firstPos = Math.abs(l - size) / 2;
-        System.arraycopy(items, nextFirst + 1, newItems, firstPos, size);
-        items = newItems;
-        nextFirst = firstPos - 1;
-        nextLast = firstPos + size;
-    }
 
     /**
      * Gets the item at the given index, where 0 is the front, 1 is the next item, and so forth.
@@ -151,11 +198,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
      */
     @Override
     public T get(int index) {
-        if (index < 0 || index > size - 1) {
+        if (index < 0 || index >= size) {
             return null;
         }
-        int itemIndex = nextFirst + 1 + index;
-        return items[itemIndex];
+        index = Math.floorMod(plusOne(nextFirst) + index, items.length);
+        return items[index];
     }
 
     /**
@@ -179,7 +226,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
         public T next() {
             T item = get(index);
-            index += 1;
+            index = plusOne(index);
             return item;
         }
     }

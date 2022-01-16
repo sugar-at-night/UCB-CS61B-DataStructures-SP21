@@ -40,5 +40,5 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
     public T max() {
         return max(cmp);
     }
-    
+
 }

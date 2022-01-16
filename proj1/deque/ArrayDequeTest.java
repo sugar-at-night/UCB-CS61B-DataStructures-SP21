@@ -2,7 +2,6 @@ package deque;
 
 import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 
@@ -14,8 +13,8 @@ public class ArrayDequeTest {
 
     @Test
     public void nonEmptyInstantiationTest() {
-        ArrayDeque<Integer> arrayDeque = new ArrayDeque<>(1);
-
+        ArrayDeque<Integer> arrayDeque = new ArrayDeque<>();
+        arrayDeque.addFirst(234);
         assertFalse("Should not be empty", arrayDeque.isEmpty());
         assertEquals("Should have size 1", 1, arrayDeque.size());
     }
@@ -43,11 +42,16 @@ public class ArrayDequeTest {
     public void addWithResizingTest() {
         ArrayDeque<Integer> arrayDeque = new ArrayDeque<>();
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 8; i++) {
             arrayDeque.addLast(i);
         }
+        for (int i = 8; i < 16; i++){
+            arrayDeque.addFirst(i);
+        }
 
-        assertEquals("Should have size 20", 20, arrayDeque.size());
+        arrayDeque.printDeque();
+        System.out.println(arrayDeque.size());
+        assertEquals("Should have size 16", 16, arrayDeque.size());
     }
 
     @Test
@@ -129,7 +133,7 @@ public class ArrayDequeTest {
             assertEquals("Should be equal", i, (int) arrayDeque.get(i));
         }
 
-        assertNull("Should be null when index out of bound", arrayDeque.get(20));
+//        assertNull("Should be null when index out of bound", arrayDeque.get(20));
     }
 
     @Test
@@ -210,24 +214,4 @@ public class ArrayDequeTest {
         }
     }
 
-
-    /**
-     * Since there is no test for printdeque method,
-     * so i write one.
-     */
-
-    @Test
-    public void printdequeTest() {
-        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
-
-        assertTrue("Should be empty", arrayDeque.isEmpty());
-
-        arrayDeque.addFirst("front");
-        arrayDeque.addLast("middle");
-        arrayDeque.addLast("back");
-
-        System.out.println("Printing out deque: ");
-        arrayDeque.printDeque();
-
-}
 }
