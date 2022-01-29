@@ -75,7 +75,7 @@ class Utils {
     /** Return an object of type T read from FILE, casting it to EXPECTEDCLASS.
      *  Throws IllegalArgumentException in case of problems. */
     static <T extends Serializable> T readObject(File file,
-                                                 Class<Dog> expectedClass) {
+                                                 Class<T> expectedClass) {
         try {
             ObjectInputStream in =
                     new ObjectInputStream(new FileInputStream(file));
